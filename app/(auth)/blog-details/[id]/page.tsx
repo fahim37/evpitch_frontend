@@ -1,4 +1,4 @@
-import { BlogDetailsClient } from "@/app/(website)/blogs/[id]/_components/BlogDetailsClient ";
+import { BlogDetailsClient } from "@/app/(website)/blogs/[id]/_components/BlogDetailsClient";
 
 export default async function BlogDetailsPage({
   params,

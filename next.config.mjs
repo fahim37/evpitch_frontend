@@ -34,6 +34,15 @@ const PAYPAL_ASSET_HOSTS = [
   'https://www.sandbox.paypalobjects.com',
 ]
 
+// Video pitches and images upload straight from the browser to Cloudflare R2
+// via presigned URLs. Cover the account endpoint (path-style) and both
+// buckets' virtual-hosted endpoints.
+const R2_UPLOAD_HOSTS = [
+  'https://5449740b86c17b732f66aadf3497ca0e.r2.cloudflarestorage.com',
+  'https://evpitch.5449740b86c17b732f66aadf3497ca0e.r2.cloudflarestorage.com',
+  'https://evpitch-images.5449740b86c17b732f66aadf3497ca0e.r2.cloudflarestorage.com',
+]
+
 const buildDirective = (name, values) =>
   `${name} ${[...new Set(values.filter(Boolean))].join(' ')};`
 
@@ -68,6 +77,7 @@ const ContentSecurityPolicy = [
     socketHttpOrigin,
     socketWsOrigin,
     'https://countriesnow.space', // country/city dropdown data
+    ...R2_UPLOAD_HOSTS,
     ...PAYPAL_HOSTS,
     ...PAYPAL_ASSET_HOSTS,
     isDev && 'ws:', // Next.js HMR websocket

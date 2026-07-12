@@ -1,7 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { BlogDetailsClient } from './_components/BlogDetailsClient ';
+import { BlogDetailsClient } from './_components/BlogDetailsClient';
 
 interface BlogPayload {
   data?: {
