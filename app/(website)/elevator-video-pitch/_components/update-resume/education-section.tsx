@@ -168,7 +168,7 @@ export const EducationSection = ({ form }: EducationSectionProps) => {
   return (
     <div>
       <div className="space-y-2 mb-4">
-        <h3>Education</h3>
+        <h3 className="text-lg font-semibold">Education</h3>
         <p className="text-sm text-muted-foreground">
           Showcase your academic background and qualifications.
         </p>

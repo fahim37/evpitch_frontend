@@ -88,11 +88,6 @@ export function RecentJobsSection() {
     );
   }
 
-  const handleJobSelect = (jobId: string) => {
-    // Handle job selection (e.g., navigate to job details)
-    console.log("Selected job:", jobId);
-  };
-
   return (
     <section className="bg-gray-50">
       <div className="container auto text-center py-12 md:py-24 lg:px-4">
@@ -105,7 +100,6 @@ export function RecentJobsSection() {
             <JobCard
               key={job._id}
               job={job}
-              onSelect={() => handleJobSelect(job._id)}
               variant="suggested" // or "list" depending on your design needs
             />
           ))}

@@ -349,7 +349,7 @@ const Candidates: React.FC<{ userId?: string }> = ({ userId }) => {
           {/* About */}
           <div className="col-span-7 lg:mt-[60px]">
             <div className="flex items-center justify-between border-b-2 pb-2">
-              <h3 className="text-2xl md:text-[40px] font-semibold text-gray-800 mb-3">
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-800 mb-3">
                 About
               </h3>
               {userId ? (
@@ -381,7 +381,7 @@ const Candidates: React.FC<{ userId?: string }> = ({ userId }) => {
 
         {/* Skills */}
         <section className="border-b py-12">
-          <h3 className="text-2xl md:text-[40px] font-semibold mb-4">Skills</h3>
+          <h3 className="text-xl md:text-2xl font-semibold mb-4">Skills</h3>
           <div className="flex flex-wrap gap-2">
             {resume.skills?.length ? (
               resume.skills.map((skill, idx) => (
@@ -401,7 +401,7 @@ const Candidates: React.FC<{ userId?: string }> = ({ userId }) => {
         {/* Experience (show all) */}
         {sortedExperiences.length > 0 && (
           <section className="border-b py-6">
-            <h3 className="text-2xl md:text-[40px] font-semibold mb-4 text-[#131313]">
+            <h3 className="text-xl md:text-2xl font-semibold mb-4 text-[#131313]">
               Experience
             </h3>
 
@@ -420,7 +420,7 @@ const Candidates: React.FC<{ userId?: string }> = ({ userId }) => {
                         <h4 className="font-bold text-[20px] text-[#595959]">
                           {exp.position || "N/A"}
                           {exp.company && (
-                            <span className="font-[10px] text-gray-700">
+                            <span className="text-base font-normal text-gray-700">
                               {" "}
                               · {exp.company}
                             </span>
@@ -453,7 +453,7 @@ const Candidates: React.FC<{ userId?: string }> = ({ userId }) => {
 
         {/* Education (show all) */}
         <section className="border-b py-6">
-          <h3 className="text-2xl md:text-[40px] font-semibold mb-4 text-[#131313]">
+          <h3 className="text-xl md:text-2xl font-semibold mb-4 text-[#131313]">
             Education
           </h3>
 
@@ -510,7 +510,7 @@ const Candidates: React.FC<{ userId?: string }> = ({ userId }) => {
         {/* Awards (show all) */}
         {sortedAwards.length > 0 && sortedAwards[0].title && (
           <section className="py-6">
-            <h3 className="text-2xl md:text-[40px] font-semibold mb-3 text-[#131313]">
+            <h3 className="text-xl md:text-2xl font-semibold mb-3 text-[#131313]">
               Awards & Honours
             </h3>
 

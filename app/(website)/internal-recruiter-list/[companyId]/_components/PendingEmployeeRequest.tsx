@@ -22,7 +22,7 @@ interface UserData {
   name: string;
   email: string;
   phoneNum: string;
-  slug: string;
+  slug?: string;
   role: string;
   avatar?: { url: string };
 }

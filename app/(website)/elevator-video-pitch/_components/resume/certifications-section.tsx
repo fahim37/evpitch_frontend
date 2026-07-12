@@ -39,7 +39,7 @@ export function CertificationsSection({ form }: CertificationsSectionProps) {
   const removeCertification = (index: number) => {
     const currentCertifications = form.getValues("certifications") || [];
     const updatedCertifications = currentCertifications.filter(
-      (_, i) => i !== index
+      (_: string, i: number) => i !== index
     );
     form.setValue("certifications", updatedCertifications);
     form.trigger("certifications"); // Force form to re-render

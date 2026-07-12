@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { fetchCompanies, Company } from "@/lib/api-service";
+import { fetchCompanies, CompanySummary } from "@/lib/api-service";
 import {
   Command,
   CommandEmpty,
@@ -31,14 +31,14 @@ export function CompanySelector({
 }: CompanySelectorProps) {
   const [open, setOpen] = useState(false);
 
-  const { data: companies = [], isLoading } = useQuery<Company[]>({
+  const { data: companies = [], isLoading } = useQuery<CompanySummary[]>({
     queryKey: ["companies"],
     queryFn: fetchCompanies,
   });
 
   // Find currently selected company
   const selectedCompanyObject = companies.find(
-    (company: Company) => company.id === selectedCompany
+    (company: CompanySummary) => company.id === selectedCompany
   );
 
   const handleSelect = (companyId: string) => {
@@ -91,7 +91,7 @@ export function CompanySelector({
                   {isLoading ? "Loading..." : "No companies found."}
                 </CommandEmpty>
                 <CommandGroup>
-                  {companies.map((company: Company) => (
+                  {companies.map((company: CompanySummary) => (
                     <CommandItem
                       key={company.id}
                       value={company.id}

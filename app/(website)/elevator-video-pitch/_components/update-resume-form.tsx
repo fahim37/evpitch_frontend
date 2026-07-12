@@ -729,7 +729,7 @@ export default function UpdateResumeForm({
 
           <div>
             <div className="mb-4">
-              <h3>Languages</h3>
+              <h3 className="text-lg font-semibold">Languages</h3>
             </div>
             <div>
               <FormField
@@ -755,7 +755,7 @@ export default function UpdateResumeForm({
 
           <div>
             <div className="mb-4">
-              <h3>Certifications</h3>
+              <h3 className="text-lg font-semibold">Certifications</h3>
             </div>
             <div>
               <FormField

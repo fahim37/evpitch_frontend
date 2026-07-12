@@ -77,7 +77,7 @@ export function LanguageSection({ form }: LanguageSectionProps) {
 
   const removeLanguage = (index: number) => {
     const currentLanguages = form.getValues("languages") || []
-    const updatedLanguages = currentLanguages.filter((_, i) => i !== index)
+    const updatedLanguages = currentLanguages.filter((_: string, i: number) => i !== index)
     form.setValue("languages", updatedLanguages)
     form.trigger("languages") // Force form to re-render
   }

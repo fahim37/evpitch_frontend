@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, type Variants } from "framer-motion"
 import { Send, MessageCircle, X } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -137,7 +137,7 @@ export default function ChatbotWidget() {
     }
   }
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.9, y: 16 },
     visible: {
       opacity: 1,
@@ -155,21 +155,21 @@ export default function ChatbotWidget() {
 
   const markdownComponents = useMemo(
     () => ({
-      p: ({ children }: { children: React.ReactNode }) => (
+      p: ({ children }: { children?: React.ReactNode }) => (
         <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
       ),
-      strong: ({ children }: { children: React.ReactNode }) => (
+      strong: ({ children }: { children?: React.ReactNode }) => (
         <strong className="font-semibold">{children}</strong>
       ),
-      em: ({ children }: { children: React.ReactNode }) => <em className="italic">{children}</em>,
-      ul: ({ children }: { children: React.ReactNode }) => (
+      em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
+      ul: ({ children }: { children?: React.ReactNode }) => (
         <ul className="mb-2 ml-4 list-disc space-y-1 last:mb-0">{children}</ul>
       ),
-      ol: ({ children }: { children: React.ReactNode }) => (
+      ol: ({ children }: { children?: React.ReactNode }) => (
         <ol className="mb-2 ml-4 list-decimal space-y-1 last:mb-0">{children}</ol>
       ),
-      li: ({ children }: { children: React.ReactNode }) => <li>{children}</li>,
-      a: ({ children, href }: { children: React.ReactNode; href?: string }) => (
+      li: ({ children }: { children?: React.ReactNode }) => <li>{children}</li>,
+      a: ({ children, href }: { children?: React.ReactNode; href?: string }) => (
         <a
           href={href}
           target="_blank"

@@ -179,15 +179,15 @@ export default function PricingSection() {
           </p>
         </div>
 
-        <div className="relative z-10 grid gap-6 md:grid-cols-2 w-[756px] mx-auto">
+        <div className="relative z-10 grid gap-6 md:grid-cols-2 w-full max-w-[756px] mx-auto">
           {/* Static Basic Plan Card */}
-          <Card className="rounded-xl shadow-lg p-6 border border-gray-200 w-[362px]">
+          <Card className="rounded-xl shadow-lg p-6 border border-gray-200 w-full max-w-[362px] mx-auto">
             <CardHeader className="pb-4">
               <p className="text-base font-semibold text-[#44B6CA] uppercase tracking-wider mb-[24px]">
                 {staticBasicPlan.title}
               </p>
               <h2 className="text-base font-normal text-[#8593A3] text-nowrap">
-                <span className="text-[#282828] text-[64px] font-bold">
+                <span className="text-[#282828] text-[40px] sm:text-[64px] font-bold">
                   Free
                 </span>{" "}
                 What you will get:
@@ -222,7 +222,7 @@ export default function PricingSection() {
 
           {/* Premium Plan Card (from API) */}
           {premiumPlan ? (
-            <Card className="rounded-xl shadow-lg bg-[#2B7FD0] text-white w-[362px]">
+            <Card className="rounded-xl shadow-lg bg-[#2B7FD0] text-white w-full max-w-[362px] mx-auto">
               <CardHeader className="mt-4">
                 <p className="text-sm font-semibold uppercase tracking-wider">
                   {premiumPlan.title}
@@ -262,7 +262,7 @@ export default function PricingSection() {
               </CardContent>
             </Card>
           ) : (
-            <Card className="rounded-xl shadow-lg p-6 border border-gray-200 w-[362px]">
+            <Card className="rounded-xl shadow-lg p-6 border border-gray-200 w-full max-w-[362px] mx-auto">
               <CardContent className="text-center py-8">
                 <p className="text-gray-500">Premium plan not available</p>
               </CardContent>

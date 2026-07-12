@@ -550,7 +550,7 @@ function EditCompanyPage({ companyId }: EditCompanyPageProps) {
       <div className="container mx-auto px-2">
         <div className="bg-white rounded-lg shadow-sm p-8">
           <div className="mb-16">
-            <h1 className="text-[48px] font-bold text-[#131313] mb-2 text-center">
+            <h1 className="text-3xl md:text-[48px] font-bold text-[#131313] mb-2 text-center">
               Edit Company/Business Account
             </h1>
           </div>
@@ -821,7 +821,7 @@ function EditCompanyPage({ companyId }: EditCompanyPageProps) {
                                   : "No industry found."}
                               </CommandEmpty>
                               <CommandGroup>
-                                {industryOptions.map((industry) => (
+                                {industryOptions.map((industry: { value: string; label: string }) => (
                                   <CommandItem
                                     key={industry.value}
                                     value={industry.value}

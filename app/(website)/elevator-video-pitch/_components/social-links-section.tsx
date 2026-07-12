@@ -198,6 +198,7 @@ export function SocialLinksSection({ form }: SocialLinksSectionProps) {
                           "https://your-website.com"
                         }
                         {...field}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
 

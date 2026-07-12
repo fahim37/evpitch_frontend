@@ -5,7 +5,7 @@ function Page() {
   return (
     <div>
       <div className="text-center py-16">
-        <h1 className="text-[40px] font-semibold leading-[120%]">
+        <h1 className="text-3xl md:text-[40px] font-semibold leading-[120%]">
           Bookmarked Jobs
         </h1>
       </div>

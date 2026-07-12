@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { ElevatorPitchUpload } from "./elevator-pitch-upload";
+import { PitchUploadProgress } from "./pitch-upload-progress";
 import { SocialLinksSection } from "./social-links-section";
 import apiClient from "@/lib/api-service";
 import Cropper, { Area } from "react-easy-crop";
@@ -474,6 +475,10 @@ export default function CreateRecruiterAccountForm() {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<string | undefined>();
   const [elevatorPitchFile, setElevatorPitchFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  // Covers the whole click-to-done window, including the delete/presign
+  // phases where the upload mutation is not pending yet.
+  const [isUploadingPitch, setIsUploadingPitch] = useState(false);
   const [isElevatorPitchUploaded, setIsElevatorPitchUploaded] = useState(false);
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -585,7 +590,11 @@ export default function CreateRecruiterAccountForm() {
       videoFile: File;
       userId: string;
     }) => {
-      return await uploadElevatorPitch({ videoFile, userId });
+      return await uploadElevatorPitch({
+        videoFile,
+        userId,
+        onUploadProgress: setUploadProgress,
+      });
     },
     onSuccess: (data) => {
       setIsElevatorPitchUploaded(true);
@@ -713,13 +722,21 @@ export default function CreateRecruiterAccountForm() {
     }
 
     try {
-      await deleteElevatorPitchMutation.mutateAsync(session.user.id);
-    } catch (_) {}
+      setIsUploadingPitch(true);
+      setUploadProgress(0);
+      try {
+        await deleteElevatorPitchMutation.mutateAsync(session.user.id);
+      } catch (_) {}
 
-    uploadElevatorPitchMutation.mutate({
-      videoFile: elevatorPitchFile,
-      userId: session.user.id,
-    });
+      await uploadElevatorPitchMutation.mutateAsync({
+        videoFile: elevatorPitchFile,
+        userId: session.user.id,
+      });
+    } catch {
+      // Error toast is handled in mutation onError
+    } finally {
+      setIsUploadingPitch(false);
+    }
   };
 
   const handleElevatorPitchDelete = async () => {
@@ -751,9 +768,20 @@ export default function CreateRecruiterAccountForm() {
     return undefined;
   };
 
+  const scrollToPitchSection = () => {
+    document
+      .getElementById("elevator-pitch-section")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const onSubmit = async (data: RecruiterFormData) => {
     if (!isElevatorPitchUploaded) {
-      toast.error("Please upload an elevator pitch video before submitting.");
+      toast.error(
+        elevatorPitchFile
+          ? "Your video is selected but not uploaded yet — click “Upload Elevator Pitch”."
+          : "Please upload an elevator pitch video before submitting."
+      );
+      scrollToPitchSection();
       return;
     }
     setIsSubmitting(true);
@@ -804,14 +832,22 @@ export default function CreateRecruiterAccountForm() {
           )}
           className="space-y-6"
         >
-          <Card>
+          <Card id="elevator-pitch-section" className="scroll-mt-24">
             <CardHeader>
-              <CardTitle className="text-lg font-medium">
-                Elevator Video Pitch©
-              </CardTitle>
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle className="text-lg font-medium">
+                  Elevator Video Pitch©
+                </CardTitle>
+                <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                  Required
+                </span>
+              </div>
               <p className="text-sm text-muted-foreground">
-                Upload a short video introducing yourself. This is required
-                before submitting.
+                Choose your video, then click{" "}
+                <span className="font-medium text-gray-700">
+                  Upload Elevator Pitch
+                </span>{" "}
+                — you can submit the form once the upload finishes.
               </p>
             </CardHeader>
             <CardContent>
@@ -822,42 +858,29 @@ export default function CreateRecruiterAccountForm() {
                 onDelete={handleElevatorPitchDelete}
                 isUploaded={isElevatorPitchUploaded}
               />
-              {elevatorPitchFile && !isElevatorPitchUploaded && (
-                <Button
-                  type="button"
-                  className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
-                  onClick={handleElevatorPitchUpload}
-                  disabled={uploadElevatorPitchMutation.isPending}
-                >
-                  {uploadElevatorPitchMutation.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      Uploading...
-                    </div>
-                  ) : (
-                    "Upload Elevator Pitch"
-                  )}
-                </Button>
-              )}
+              {elevatorPitchFile &&
+                !isElevatorPitchUploaded &&
+                (isUploadingPitch || uploadElevatorPitchMutation.isPending ? (
+                  <PitchUploadProgress
+                    progress={uploadProgress}
+                    fileName={elevatorPitchFile.name}
+                    className="mt-4"
+                  />
+                ) : (
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <p className="mb-3 text-sm font-medium text-amber-800">
+                      Video selected — one more step: upload it to save it to
+                      your profile.
+                    </p>
+                    <Button
+                      type="button"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-medium"
+                      onClick={handleElevatorPitchUpload}
+                    >
+                      Upload Elevator Pitch
+                    </Button>
+                  </div>
+                ))}
               {isElevatorPitchUploaded && (
                 <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
                   <p className="text-sm text-green-600 font-medium">
@@ -1119,11 +1142,28 @@ export default function CreateRecruiterAccountForm() {
                   </svg>
                   Saving...
                 </div>
+              ) : !isElevatorPitchUploaded ? (
+                "Upload Elevator Pitch First"
               ) : (
                 "Save"
               )}
             </Button>
           </div>
+
+          {!isElevatorPitchUploaded && (
+            <p className="text-center text-sm text-red-600">
+              {elevatorPitchFile
+                ? "Your video is selected but not uploaded yet — click “Upload Elevator Pitch” in the video section."
+                : "Please upload your Elevator Video Pitch© before submitting."}{" "}
+              <button
+                type="button"
+                onClick={scrollToPitchSection}
+                className="font-medium underline underline-offset-2"
+              >
+                Go to video upload
+              </button>
+            </p>
+          )}
         </form>
       </Form>
     </div>

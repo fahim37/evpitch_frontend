@@ -249,15 +249,15 @@ export function PersonalInfoSection({
       {/* About Us Section */}
       <div className="border border-gray-400 rounded-lg p-4 lg:p-6">
         <div className="">
-          <div className="grid grid-cols-1 lg:grid-cols-8 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-8 gap-4 lg:gap-6">
             {/* Photo Upload with Cropper */}
-            <div className="col-span-2">
+            <div className="lg:col-span-2">
               <div className="flex items-center justify-between mb-2">
                 <FormLabel className="text-blue-600 font-medium">
                   Profile photo
                 </FormLabel>
               </div>
-              <div className="border border-gray-400 rounded-lg p-6 w-full max-w-[250px] h-[250px] flex items-center justify-center overflow-hidden">
+              <div className="border border-gray-400 rounded-lg p-6 w-full max-w-[250px] h-[250px] flex items-center justify-center overflow-hidden mx-auto sm:mx-0">
                 <PhotoUpload
                   onFileSelect={onPhotoUpload}
                   previewUrl={photoPreview}
@@ -266,7 +266,7 @@ export function PersonalInfoSection({
             </div>
 
             {/* About Us Text Area */}
-            <div className="col-span-6 flex-1">
+            <div className="lg:col-span-6 flex-1">
               <div className="flex items-center justify-between mb-2">
                 <FormLabel className="text-blue-600 font-medium">
                   About Me
@@ -279,8 +279,10 @@ export function PersonalInfoSection({
                   <FormItem>
                     <FormControl>
                       <Textarea
-                        value={field.value}
+                        value={field.value ?? ""}
                         onChange={field.onChange}
+                        placeholder="Tell us a little about yourself..."
+                        className="min-h-[160px] lg:min-h-[218px] resize-y"
                       />
                     </FormControl>
                     <p className="text-sm text-muted-foreground">

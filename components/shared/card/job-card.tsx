@@ -587,7 +587,7 @@ export default function JobCard({
   const Body = () => (
     <>
       {/* Description */}
-      <DescriptionClamp html={job.description} maxLines={4} className="mt-2" />
+      <DescriptionClamp html={job.description ?? ""} maxLines={4} className="mt-2" />
 
       {/* Profile fit bar + details */}
       <div className="space-y-2 mt-3">
@@ -621,7 +621,7 @@ export default function JobCard({
       </div>
 
       <div className="text-[#059c05] font-semibold mt-3">
-        {formatDate(job.updatedAt)}
+        {job.updatedAt ? formatDate(job.updatedAt) : null}
       </div>
     </>
   );

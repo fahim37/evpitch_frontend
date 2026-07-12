@@ -159,7 +159,7 @@ export const ExperienceSection = ({ form }: ExperienceSectionProps) => {
   return (
     <div>
       <div className="mb-4 space-y-2">
-        <h3>Experience (Optional)</h3>
+        <h3 className="text-lg font-semibold">Experience (Optional)</h3>
         <p className="text-sm text-muted-foreground">
           Highlight your work journey and key achievements.
         </p>

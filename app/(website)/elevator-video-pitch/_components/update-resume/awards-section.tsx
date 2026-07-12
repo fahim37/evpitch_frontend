@@ -138,7 +138,7 @@ export const AwardsSection = ({ form, awardFields }: AwardsSectionProps) => {
   return (
     <div>
       <div className="mb-4 space-y-2">
-        <h3>Awards & Honors (Optional)</h3>
+        <h3 className="text-lg font-semibold">Awards & Honors (Optional)</h3>
         <p className="text-sm text-muted-foreground">
           Highlight your achievements and recognitions.
         </p>

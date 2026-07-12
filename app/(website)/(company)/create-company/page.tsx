@@ -29,6 +29,7 @@ import {
 import { FileUpload } from "@/components/company/file-upload";
 import { EmployeeSelector } from "@/components/company/employee-selector";
 import { DynamicInputList } from "@/components/company/dynamic-input-list";
+import { PitchUploadProgress } from "@/app/(website)/elevator-video-pitch/_components/pitch-upload-progress";
 import { createCompany, uploadElevatorPitch } from "@/lib/api-service";
 
 const formSchema = z.object({
@@ -53,6 +54,7 @@ export default function CreateCompanyPage() {
   const queryClient = useQueryClient();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [elevatorPitchFile, setElevatorPitchFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [websites, setWebsites] = useState<string[]>([""]);
   const [services, setServices] = useState<string[]>([""]);
@@ -173,9 +175,11 @@ export default function CreateCompanyPage() {
 
       // Upload elevator pitch if provided
       if (elevatorPitchFile && session.user.id) {
+        setUploadProgress(0);
         await uploadElevatorPitchMutation.mutateAsync({
           videoFile: elevatorPitchFile,
           userId: session.user.id,
+          onUploadProgress: setUploadProgress,
         });
       }
     } catch (error) {
@@ -219,6 +223,12 @@ export default function CreateCompanyPage() {
               maxSize={32 * 1024 * 1024}
               variant="dark"
             ></FileUpload>
+            {uploadElevatorPitchMutation.isPending && (
+              <PitchUploadProgress
+                progress={uploadProgress}
+                fileName={elevatorPitchFile?.name}
+              />
+            )}
           </div>
 
           {/* Company Logo and About */}

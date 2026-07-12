@@ -91,10 +91,20 @@ export async function fetchUsers(companyUserId?: string) {
   return response.data.data as User[];
 }
 
+// Shape returned by GET /all/companies (backend maps _id -> id and
+// returns a trimmed-down projection of the Company document)
+export interface CompanySummary {
+  id: string;
+  cname: string;
+  clogo: string;
+  cemail: string;
+  industry: string;
+}
+
 export async function fetchCompanies() {
   const url = `/all/companies`;
   const response = await apiClient.get(url);
-  return response.data.data as User[];
+  return response.data.data as CompanySummary[];
 }
 
 // Fetch company details

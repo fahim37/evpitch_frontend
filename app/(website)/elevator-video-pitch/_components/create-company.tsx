@@ -23,6 +23,7 @@ import {
 import { EmployeeSelector } from "@/components/company/employee-selector";
 import { DynamicInputList } from "@/components/company/dynamic-input-list";
 import { ElevatorPitchUpload } from "./elevator-pitch-upload";
+import { PitchUploadProgress } from "./pitch-upload-progress";
 import {
   createCompany,
   uploadElevatorPitch,
@@ -360,6 +361,10 @@ export default function CreateCompanyPage() {
   const [elevatorPitchFile, setElevatorPitchFile] = useState<File | null>(null);
   const [isElevatorPitchUploaded, setIsElevatorPitchUploaded] = useState(false);
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  // Covers the whole click-to-done window, including the delete/presign
+  // phases where the upload mutation is not pending yet.
+  const [isUploadingPitch, setIsUploadingPitch] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
@@ -521,7 +526,11 @@ export default function CreateCompanyPage() {
       videoFile: File;
       userId: string;
     }) => {
-      return await uploadElevatorPitch({ videoFile, userId });
+      return await uploadElevatorPitch({
+        videoFile,
+        userId,
+        onUploadProgress: setUploadProgress,
+      });
     },
     onSuccess: (data) => {
       setIsElevatorPitchUploaded(true);
@@ -555,6 +564,8 @@ export default function CreateCompanyPage() {
 
     try {
       setIsSubmitting(true);
+      setIsUploadingPitch(true);
+      setUploadProgress(0);
 
       try {
         await deleteElevatorPitchMutation.mutateAsync(session.user.id);
@@ -570,6 +581,7 @@ export default function CreateCompanyPage() {
       console.error("Upload failed:", err);
       toast.error("Could not upload your elevator pitch.");
     } finally {
+      setIsUploadingPitch(false);
       setIsSubmitting(false);
     }
   };
@@ -605,7 +617,14 @@ export default function CreateCompanyPage() {
       return;
     }
     if (!isElevatorPitchUploaded) {
-      toast.error("Please upload an elevator pitch video before submitting.");
+      toast.error(
+        elevatorPitchFile
+          ? "Your video is selected but not uploaded yet — click “Upload Elevator Pitch”."
+          : "Please upload an elevator pitch video before submitting."
+      );
+      document
+        .getElementById("elevator-pitch-section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
 
@@ -671,15 +690,25 @@ export default function CreateCompanyPage() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="space-y-4">
+          <div id="elevator-pitch-section" className="space-y-4 scroll-mt-24">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                  Upload Company Elevator Video Pitch©
-                </h2>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Upload Company Elevator Video Pitch©
+                  </h2>
+                  <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                    Required
+                  </span>
+                </div>
                 <p className="text-sm text-gray-600 max-w-2xl">
                   Upload a 60-second elevator video pitch introducing your
                   company and what should make candidates want to join you!
+                  Choose your video, then click{" "}
+                  <span className="font-medium text-gray-700">
+                    Upload Elevator Pitch
+                  </span>{" "}
+                  before submitting the form.
                 </p>
               </div>
             </div>
@@ -691,6 +720,29 @@ export default function CreateCompanyPage() {
               onDelete={handleElevatorPitchDelete}
               isUploaded={isElevatorPitchUploaded}
             />
+            {elevatorPitchFile &&
+              !isElevatorPitchUploaded &&
+              (isUploadingPitch || uploadElevatorPitchMutation.isPending ? (
+                <PitchUploadProgress
+                  progress={uploadProgress}
+                  fileName={elevatorPitchFile.name}
+                />
+              ) : (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                  <p className="text-sm font-medium text-amber-800">
+                    Video selected — one more step: click “Upload Elevator
+                    Pitch” below to save it.
+                  </p>
+                </div>
+              ))}
+            {isElevatorPitchUploaded && (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+                <p className="text-sm font-medium text-green-600">
+                  ✓ Elevator pitch upload finished! We’re processing your
+                  video—feel free to submit while it finalizes.
+                </p>
+              </div>
+            )}
             <div className="flex justify-center">
               <Button
                 type="button"
@@ -698,11 +750,12 @@ export default function CreateCompanyPage() {
                 onClick={handleElevatorPitchUpload}
                 disabled={
                   !elevatorPitchFile ||
+                  isUploadingPitch ||
                   uploadElevatorPitchMutation.isPending ||
                   isElevatorPitchUploaded
                 }
               >
-                {uploadElevatorPitchMutation.isPending ? (
+                {isUploadingPitch || uploadElevatorPitchMutation.isPending ? (
                   <div className="flex items-center gap-2">
                     <svg
                       className="animate-spin h-5 w-5 text-white"
@@ -981,10 +1034,31 @@ export default function CreateCompanyPage() {
                 </svg>
                 Creating...
               </div>
+            ) : !isElevatorPitchUploaded ? (
+              "Upload Elevator Pitch First"
             ) : (
               "Save"
             )}
           </Button>
+
+          {!isElevatorPitchUploaded && (
+            <p className="text-center text-sm text-red-600">
+              {elevatorPitchFile
+                ? "Your video is selected but not uploaded yet — click “Upload Elevator Pitch” in the video section."
+                : "Please upload your company Elevator Video Pitch© before submitting."}{" "}
+              <button
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById("elevator-pitch-section")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+                className="font-medium underline underline-offset-2"
+              >
+                Go to video upload
+              </button>
+            </p>
+          )}
         </form>
       </Form>
     </div>

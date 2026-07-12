@@ -25,7 +25,7 @@ export function HowItWorksCompany() {
         <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-[40px] text-[#000000]">
           How It Works in three simple steps (Company)
         </h2>
-        <div className="w-[785px] h-[4px] bg-[#2B7FD0] rounded-[35px] mt-4"></div>
+        <div className="w-full max-w-[785px] h-[4px] bg-[#2B7FD0] rounded-[35px] mt-4"></div>
 
         <div className="md:text-xl">
           <ol className="list-decimal list-inside space-y-1 text-[#707070] font-medium justify-start mt-[32px]">

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VideoPlayer } from "@/components/company/video-player";
 import { ElevatorPitchUpload } from "./elevator-pitch-upload"; // Assumed component
+import { PitchUploadProgress } from "./pitch-upload-progress";
 import {
   fetchCompanyDetails,
   uploadElevatorPitch,
@@ -129,6 +130,7 @@ export default function CompanyProfilePage({ userId }: { userId?: string }) {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [elevatorPitchFile, setElevatorPitchFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isElevatorPitchUploaded, setIsElevatorPitchUploaded] =
     useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -293,9 +295,11 @@ export default function CompanyProfilePage({ userId }: { userId?: string }) {
   const handleElevatorPitchUpload = async () => {
     if (elevatorPitchFile && userId) {
       try {
+        setUploadProgress(0);
         await uploadElevatorPitchMutation.mutateAsync({
           videoFile: elevatorPitchFile,
           userId,
+          onUploadProgress: setUploadProgress,
         });
       } catch (error) {
         // Error toast is handled in mutation onError
@@ -599,42 +603,22 @@ export default function CompanyProfilePage({ userId }: { userId?: string }) {
                   onFileSelect={setElevatorPitchFile}
                   selectedFile={elevatorPitchFile}
                 />
-                <Button
-                  type="button"
-                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={handleElevatorPitchUpload}
-                  disabled={
-                    uploadElevatorPitchMutation.isPending || !elevatorPitchFile
-                  }
-                >
-                  {uploadElevatorPitchMutation.isPending ? (
-                    <div className="flex items-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Uploading...
-                    </div>
-                  ) : (
-                    "Upload Elevator Pitch"
-                  )}
-                </Button>
+                {uploadElevatorPitchMutation.isPending ? (
+                  <PitchUploadProgress
+                    progress={uploadProgress}
+                    fileName={elevatorPitchFile?.name}
+                    className="mt-4"
+                  />
+                ) : (
+                  <Button
+                    type="button"
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleElevatorPitchUpload}
+                    disabled={!elevatorPitchFile}
+                  >
+                    Upload Elevator Pitch
+                  </Button>
+                )}
 
                 {isElevatorPitchUploaded && (
                   <p className="mt-2 text-sm text-green-600">

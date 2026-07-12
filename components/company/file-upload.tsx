@@ -6,6 +6,7 @@ import { Upload, X } from "lucide-react";
 // Assuming you have the Sonner package installed and a Toaster component set up in your layout
 import { toast } from "sonner"; // 👈 New import for toast
 import { Button } from "@/components/ui/button";
+import { VideoPlayer } from "@/components/company/video-player";
 import { cn } from "@/lib/utils";
 
 
@@ -17,7 +18,7 @@ interface FileUploadProps {
   maxSize?: number;
   className?: string;
   children?: React.ReactNode;
-  variant?: "default" | "dark";
+  variant?: "default" | "dark" | "brand";
   defaultUrl?: string;
 }
 
@@ -123,11 +124,16 @@ export function FileUpload({
       }
       if (selectedFile?.type?.startsWith("video/")) {
         return (
-          <div className="relative w-full h-full">
-            <video
+          // Stop propagation so player controls don't reopen the file picker
+          <div
+            className="relative w-full h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <VideoPlayer
               src={previewUrl}
-              controls
-              className="w-full h-full object-cover rounded-lg"
+              autoPlay={false}
+              poster=""
+              title="Video preview"
             />
             <RemoveBtn />
           </div>
@@ -192,12 +198,15 @@ export function FileUpload({
       <div
         className={cn(
           "border-2 border-dashed rounded-lg p-2 text-center cursor-pointer transition-colors h-full flex items-center justify-center",
-          variant === "dark"
-            ? "border-gray-600 hover:border-gray-500 bg-gray-800/50"
-            : "border-gray-300 hover:border-gray-400",
+          variant === "dark" && "border-gray-600 hover:border-gray-500 bg-gray-800/50",
+          variant === "default" && "border-gray-300 hover:border-gray-400",
+          variant === "brand" &&
+            "rounded-xl border-[#2B7FD0]/40 hover:border-[#2B7FD0]/70 bg-[#2B7FD0]/[0.03] hover:bg-[#2B7FD0]/[0.06]",
           dragActive &&
             (variant === "dark"
               ? "border-blue-400 bg-gray-700"
+              : variant === "brand"
+              ? "border-[#2B7FD0] bg-[#2B7FD0]/10"
               : "border-blue-500 bg-blue-50")
         )}
         onDragEnter={handleDrag}

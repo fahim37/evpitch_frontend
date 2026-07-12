@@ -39,6 +39,7 @@ import { CompanySelector } from "@/components/company/company-selector";
 import SocialLinks from "./SocialLinks";
 import { SocialLinksSection } from "./social-links-section";
 import { ElevatorPitchUpload } from "./elevator-pitch-upload";
+import { PitchUploadProgress } from "./pitch-upload-progress";
 import {
   Command,
   CommandEmpty,
@@ -137,6 +138,27 @@ export type Recruiter = {
 };
 
 const FALLBACK_IMAGE = "/placeholder.svg";
+
+// Inputs bound with {...field} must never start with undefined values,
+// otherwise React flips them from uncontrolled to controlled on first edit.
+const toFormValues = (r: Recruiter): Recruiter => ({
+  ...r,
+  firstName: r.firstName || "",
+  sureName: r.sureName || "",
+  title: r.title || "",
+  bio: r.bio || "",
+  aboutUs: r.aboutUs || "",
+  country: r.country || "",
+  city: r.city || "",
+  zipCode: r.zipCode || "",
+  emailAddress: r.emailAddress || "",
+  upworkUrl: r.upworkUrl || "",
+  linkedIn: r.linkedIn || "",
+  xLink: r.xLink || "",
+  OtherLink: r.OtherLink || "",
+  roleAtCompany: r.roleAtCompany || "",
+  sLink: r.sLink || [],
+});
 
 function parseMaybeStringifiedArray(input: MaybeStringifiedArray): string[] {
   if (!input) return [];
@@ -244,15 +266,13 @@ export default function EditableRecruiterAccount({
   const [loadingPitch, setLoadingPitch] = useState(true);
   const [pitchData, setPitchData] = useState<PitchData | null>(null);
   const [elevatorPitchFile, setElevatorPitchFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isElevatorPitchUploaded, setIsElevatorPitchUploaded] =
     useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const form = useForm<Recruiter>({
-    defaultValues: {
-      ...recruiter,
-      sLink: recruiter.sLink || [],
-    },
+    defaultValues: toFormValues(recruiter),
     mode: "onChange",
   });
 
@@ -288,11 +308,8 @@ export default function EditableRecruiterAccount({
     setSelectedCompany(recruiter.companyId?._id || "");
     setSelectedCountry(recruiter.country || "");
     form.reset({
-      ...recruiter,
-      sLink: recruiter.sLink || [],
+      ...toFormValues(recruiter),
       companyId: recruiter.companyId || undefined,
-      country: recruiter.country || "",
-      city: recruiter.city || "",
     });
   }, [recruiter, form]);
 
@@ -384,9 +401,11 @@ export default function EditableRecruiterAccount({
   const handleElevatorPitchUpload = async () => {
     if (elevatorPitchFile && userId) {
       try {
+        setUploadProgress(0);
         await uploadElevatorPitchMutation.mutateAsync({
           videoFile: elevatorPitchFile,
           userId,
+          onUploadProgress: setUploadProgress,
         });
       } catch {
         // Error toast is handled in mutation onError
@@ -414,7 +433,8 @@ export default function EditableRecruiterAccount({
     setIsDeleteModalOpen(false);
   };
 
-  const handleBannerUpload = (file: File) => {
+  const handleBannerUpload = (file: File | null) => {
+    if (!file) return;
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload a valid image file.");
       return;
@@ -431,7 +451,8 @@ export default function EditableRecruiterAccount({
     reader.readAsDataURL(file);
   };
 
-  const handlePhotoSelect = (file: File) => {
+  const handlePhotoSelect = (file: File | null) => {
+    if (!file) return;
     if (!file.type.startsWith("image/")) {
       toast.error("Please upload a valid image file.");
       return;
@@ -503,7 +524,7 @@ export default function EditableRecruiterAccount({
       setBannerFile(null);
       setIsBannerUploaded(false);
       setIsPhotoUploaded(false);
-      form.reset(updatedRecruiter);
+      form.reset(toFormValues(updatedRecruiter));
 
       toast.success("Profile updated successfully!");
       // setTimeout(() => {
@@ -529,7 +550,7 @@ export default function EditableRecruiterAccount({
     setBannerFile(null);
     setIsBannerUploaded(false);
     setIsPhotoUploaded(false);
-    form.reset({ ...recruiter, sLink: recruiter.sLink || [] });
+    form.reset(toFormValues(recruiter));
   };
 
   const {
@@ -608,7 +629,6 @@ export default function EditableRecruiterAccount({
                     <PhotoUpload
                       onFileSelect={handlePhotoSelect}
                       previewUrl={displayPhoto}
-                      onUploadSuccess={() => setIsPhotoUploaded(true)}
                     />
                   </div>
                 ) : recruiter?.photo ? (
@@ -632,10 +652,7 @@ export default function EditableRecruiterAccount({
                 {!isEditing ? (
                   <Button
                     onClick={() => {
-                      form.reset({
-                        ...recruiter,
-                        sLink: recruiter.sLink || [],
-                      });
+                      form.reset(toFormValues(recruiter));
                       setIsEditing(true);
                     }}
                     variant="outline"
@@ -1075,43 +1092,22 @@ export default function EditableRecruiterAccount({
                     onFileSelect={setElevatorPitchFile}
                     selectedFile={elevatorPitchFile}
                   />
-                  <Button
-                    type="button"
-                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleElevatorPitchUpload}
-                    disabled={
-                      uploadElevatorPitchMutation.isPending ||
-                      !elevatorPitchFile
-                    }
-                  >
-                    {uploadElevatorPitchMutation.isPending ? (
-                      <div className="flex items-center gap-2">
-                        <svg
-                          className="animate-spin h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Uploading...
-                      </div>
-                    ) : (
-                      "Upload Elevator Pitch"
-                    )}
-                  </Button>
+                  {uploadElevatorPitchMutation.isPending ? (
+                    <PitchUploadProgress
+                      progress={uploadProgress}
+                      fileName={elevatorPitchFile?.name}
+                      className="mt-4"
+                    />
+                  ) : (
+                    <Button
+                      type="button"
+                      className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={handleElevatorPitchUpload}
+                      disabled={!elevatorPitchFile}
+                    >
+                      Upload Elevator Pitch
+                    </Button>
+                  )}
 
                   {isElevatorPitchUploaded && (
                     <p className="mt-2 text-sm text-green-600">

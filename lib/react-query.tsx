@@ -28,7 +28,6 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
     <SessionProvider
       refetchOnWindowFocus={false}
       refetchInterval={0}
-      refetchWhenHidden={false}
       refetchWhenOffline={false}
       // NOTE: no `staleTime` prop here
     >
